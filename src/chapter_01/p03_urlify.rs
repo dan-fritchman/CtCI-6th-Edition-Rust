@@ -1,6 +1,6 @@
 //!
 //! # URLify:
-//! 
+//!
 //! Write a method to replace all spaces in a string with '%20'.
 //! You may assume that the string has sufficient space at the end to hold the additional characters,
 //! and that you are given the "true" length of the string.
@@ -24,8 +24,7 @@
 /// It is not entirely clear (to the author) whether consecutive spaces should generate one or more "%20" sequences.
 /// This implementation replaces each space with a unique "%20".
 ///
-#[allow(dead_code)]
-fn urlify(s: &str, truelen: usize) -> String {
+pub fn urlify(s: &str, truelen: usize) -> String {
     let mut rv = String::new();
     let mut chars = s.chars();
     for _ in 0..truelen {

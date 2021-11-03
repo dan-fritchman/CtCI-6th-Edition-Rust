@@ -1,8 +1,9 @@
 //!
-//! # Is Unique: 
-//! 
+//! # Is Unique:
+//!
 //! Implement an algorithm to determine if a string has all unique characters.  
 //! What if you cannot use additional data structures?
+//!
 //! Hints: #44, # 777, # 732
 //!
 
@@ -15,11 +16,10 @@ use std::collections::HashSet;
 /// and comparing the size (length) of `s` with that of the hash-set.
 /// Any duplicates will result in the set having fewer elements than the input string.
 ///
-#[allow(dead_code)]
-fn is_unique(s: &str) -> bool {
+pub fn is_unique(s: &str) -> bool {
     let mut set = HashSet::new();
     for c in s.chars() {
-        set.insert(c.clone());
+        set.insert(c);
     }
     set.len() == s.len()
 }

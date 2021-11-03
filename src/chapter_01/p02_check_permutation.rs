@@ -12,8 +12,7 @@ use super::utils::char_counts;
 ///
 /// Collect character-counts in a hashmap, and compare the two.
 ///
-#[allow(dead_code)]
-fn is_permutation(a: &str, b: &str) -> bool {
+pub fn is_permutation(a: &str, b: &str) -> bool {
     // Before getting into the real work, check lengths.
     if a.len() != b.len() {
         return false;

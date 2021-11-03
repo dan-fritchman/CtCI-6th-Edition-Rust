@@ -21,8 +21,7 @@ use super::utils::alpha_char_counts;
 /// Creates a count of each (alpha) character, iterates over the counts,
 /// and returns false if more than a single count is odd.
 ///
-#[allow(dead_code)]
-fn is_palindrome_permutation(s: &str) -> bool {
+pub fn is_palindrome_permutation(s: &str) -> bool {
     let char_counts = alpha_char_counts(s);
     let mut seen_an_odd_one = false;
     for (_c, cnt) in char_counts {
