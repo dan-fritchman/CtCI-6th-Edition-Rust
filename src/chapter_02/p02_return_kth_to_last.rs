@@ -15,7 +15,7 @@ use super::utils::List;
 /// Since this is a doubly-linked list, we can just count `k` elements from the tail.
 /// Returns `None` if k is greater than the length of the list.
 ///
-pub fn kth_to_last<T: Default>(list: &List<T>, k: usize) -> Option<&T> {
+pub fn kth_to_last<T>(list: &List<T>, k: usize) -> Option<&T> {
     // Note `k==1` appears to want the tail.
     // So if we get k<1, return None, I guess.
     if k < 1 {

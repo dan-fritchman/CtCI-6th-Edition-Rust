@@ -19,7 +19,7 @@ use std::collections::HashSet;
 // Local Imports
 use super::utils::{List, NodeIndex};
 
-pub fn loop_detect<T: Default>(list: &List<T>) -> Option<NodeIndex> {
+pub fn loop_detect<T>(list: &List<T>) -> Option<NodeIndex> {
     let mut seen: HashSet<NodeIndex> = HashSet::new();
     let mut ptr = list.head;
     while let Some(idx) = ptr {

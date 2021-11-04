@@ -18,13 +18,24 @@ pub struct Node<T> {
 }
 
 /// Doubly Linked List
-#[derive(Debug, Default)]
-pub struct List<T: Default> {
+#[derive(Debug)]
+pub struct List<T> {
     pub nodes: Vec<Node<T>>,
     pub head: Option<NodeIndex>,
     pub tail: Option<NodeIndex>,
 }
-impl<T: Clone + Default> List<T> {
+// Sadly this *is not* what [derive(Default)] generates,
+// likely due to https://github.com/rust-lang/rust/issues/26925.
+impl<T> Default for List<T> {
+    fn default() -> Self {
+        Self {
+            nodes: Vec::new(),
+            head: None,
+            tail: None,
+        }
+    }
+}
+impl<T: Clone> List<T> {
     /// Also available via [Default]
     pub fn new() -> Self {
         Self::default()
@@ -79,7 +90,7 @@ impl<T: Clone + Default> List<T> {
     }
 }
 /// Create a [List] from a vector or similar slice of `T` data elements.
-impl<T: Clone + Default> From<&[T]> for List<T> {
+impl<T: Clone> From<&[T]> for List<T> {
     fn from(slice: &[T]) -> Self {
         let mut list = List::new();
         for item in slice {
@@ -90,13 +101,13 @@ impl<T: Clone + Default> From<&[T]> for List<T> {
 }
 /// Square-bracket indexing into a [List].
 /// Accesses the node correspinding to [NodeIndex] `idx`.
-impl<T: Default> Index<NodeIndex> for List<T> {
+impl<T> Index<NodeIndex> for List<T> {
     type Output = Node<T>;
     fn index(&self, idx: NodeIndex) -> &Self::Output {
         &self.nodes[idx.0]
     }
 }
-impl<T: Default> IndexMut<NodeIndex> for List<T> {
+impl<T> IndexMut<NodeIndex> for List<T> {
     fn index_mut(&mut self, idx: NodeIndex) -> &mut Self::Output {
         &mut self.nodes[idx.0]
     }

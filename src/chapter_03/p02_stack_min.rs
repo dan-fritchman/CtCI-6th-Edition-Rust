@@ -13,7 +13,7 @@ pub struct StackWithMins<T> {
     vec: Vec<T>,
     mins: Vec<T>,
 }
-impl<T: Clone + Default + PartialEq + PartialOrd> StackWithMins<T> {
+impl<T: Clone + PartialOrd> StackWithMins<T> {
     pub fn push(&mut self, t: T) {
         // If `t` is le our current min, add a copy to the min-stack
         match self.min() {
@@ -29,7 +29,7 @@ impl<T: Clone + Default + PartialEq + PartialOrd> StackWithMins<T> {
         let rv = self.vec.pop()?;
         // And if it equals the min, pop the min-stack too.
         // Note in order to survive the `?` and be here, `min` must have an entry.
-        if rv == *self.min().unwrap() {
+        if rv <= *self.min().unwrap() {
             self.mins.pop();
         }
         Some(rv)

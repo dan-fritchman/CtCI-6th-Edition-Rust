@@ -25,7 +25,7 @@ use super::utils::List;
 /// This solution *does not* use the "follow-up" method lacking intermediate storage,
 /// which requires adding a two-pointer two-pass approach.  
 ///
-pub fn remove_dups<T: Default>(list: &mut List<T>)
+pub fn remove_dups<T>(list: &mut List<T>)
 where
     T: Clone + Hash + PartialEq + Eq,
 {

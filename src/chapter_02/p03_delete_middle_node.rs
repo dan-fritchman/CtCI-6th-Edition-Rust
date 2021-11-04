@@ -29,7 +29,7 @@ use super::utils::{List, NodeIndex};
 /// *But!* we can do some stuff the target implementation can't.
 /// Notably, deleting first and last elements in the list is fine here.
 ///
-pub fn delete_node<T: Default>(list: &mut List<T>, remove: NodeIndex) {
+pub fn delete_node<T>(list: &mut List<T>, remove: NodeIndex) {
     match (list[remove].prev, list[remove].next) {
         (Some(prev), Some(next)) => {
             // Node is in the middle, not the head or tail

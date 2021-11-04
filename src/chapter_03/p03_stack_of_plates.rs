@@ -21,7 +21,7 @@ pub struct PlateStack<T> {
     threshold: usize,
     stacks: Vec<Stack<T>>,
 }
-impl<T: Default + Clone + PartialOrd + PartialEq> PlateStack<T> {
+impl<T> PlateStack<T> {
     pub fn new(threshold: usize) -> Self {
         Self {
             stacks: vec![Stack::new()],
@@ -40,7 +40,7 @@ impl<T: Default + Clone + PartialOrd + PartialEq> PlateStack<T> {
         // Pop from the current stack
         let mut rv = self.last_mut().pop();
         // And if it was empty, *and* we have more than one stack, pop it
-        if rv == None && self.stacks.len() > 1 {
+        if rv.is_none() && self.stacks.len() > 1 {
             self.stacks.pop();
             rv = self.last_mut().pop();
         }

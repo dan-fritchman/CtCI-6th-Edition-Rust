@@ -17,9 +17,16 @@
 pub struct Stack<T> {
     vec: Vec<T>,
 }
+// Sadly this *is not* what [derive(Default)] generates,
+// likely due to https://github.com/rust-lang/rust/issues/26925.
+impl<T> Default for Stack<T> {
+    fn default() -> Self {
+        Self { vec: Vec::new() }
+    }
+}
 impl<T> Stack<T> {
     pub fn new() -> Self {
-        Self { vec: Vec::new() }
+        Self::default()
     }
     pub fn push(&mut self, t: T) {
         self.vec.push(t)

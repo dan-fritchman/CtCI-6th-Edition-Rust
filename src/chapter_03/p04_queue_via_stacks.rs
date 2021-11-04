@@ -19,12 +19,19 @@ pub struct MyQueue<T> {
     new: Stack<T>,
     old: Stack<T>,
 }
-impl<T> MyQueue<T> {
-    pub fn new() -> Self {
+// Sadly this *is not* what [derive(Default)] generates,
+// likely due to https://github.com/rust-lang/rust/issues/26925.
+impl<T> Default for MyQueue<T> {
+    fn default() -> Self {
         Self {
             new: Stack::new(),
             old: Stack::new(),
         }
+    }
+}
+impl<T> MyQueue<T> {
+    pub fn new() -> Self {
+        Self::default()
     }
     pub fn push(&mut self, t: T) {
         self.new.push(t)
