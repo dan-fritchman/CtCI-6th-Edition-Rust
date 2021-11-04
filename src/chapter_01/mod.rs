@@ -1,5 +1,6 @@
 //!
 //! # Chapter 1 Module
+//! ## Arrays and Strings
 //!
 
 // Problems
