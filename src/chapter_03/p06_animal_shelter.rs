@@ -12,6 +12,7 @@
 //! Hints: #22, #56, #63
 //!
 
+#[ignore] // FIXME!
 #[test]
 fn test_animal_shelter() {
     todo!()

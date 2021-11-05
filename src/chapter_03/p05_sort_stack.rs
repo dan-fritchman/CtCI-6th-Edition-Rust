@@ -11,10 +11,11 @@
 // Local Imports
 use super::utils::Stack;
 
-pub fn sort_stack<T: PartialOrd>(stack: &mut Stack<T>) {
+pub fn sort_stack<T: PartialOrd>(_stack: &mut Stack<T>) {
     todo!()
 }
 
+#[ignore] // FIXME!
 #[test]
 fn test_sort_stack() {
     todo!()
