@@ -25,7 +25,7 @@ fn helper(steps: isize, cache: &mut HashMap<isize, isize>) -> isize {
     } else if steps == 0 {
         return 1;
     } else if cache.contains_key(&steps) {
-        return cache.get(&steps).unwrap().clone();
+        return *cache.get(&steps).unwrap();
     }
     // No base-cases checked out. Recurse and do some real work.
     let rv = helper(steps - 1, cache) + helper(steps - 2, cache) + helper(steps - 3, cache);

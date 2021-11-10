@@ -27,36 +27,35 @@ pub fn robot_grid(grid: &Grid) -> Option<Path> {
     if grid.is_empty() || grid[0].is_empty() {
         return None;
     }
-
-    // Initialize our path and cache
-    let mut path = Path::new();
+    // Initialize our failed-nodes cache
     let mut failed = Cache::new();
-    let pos = ((grid.len() - 1) as isize, (grid[0].len() - 1) as isize);
-
-    // And run our recursive helper
-    if helper(grid, &mut path, &mut failed, pos) {
-        Some(path) // Return the path collected along the way
-    } else {
-        None // No path found
-    }
+    // And run our recursive helper, looking for the finish line
+    let finish_line = ((grid.len() - 1) as isize, (grid[0].len() - 1) as isize);
+    helper(grid, &mut failed, finish_line)
 }
 
 /// Recursive helper function, including the running path and failed-cache
-fn helper(grid: &Grid, path: &mut Path, failed: &mut Cache, pos: Point) -> bool {
+fn helper(grid: &Grid, failed: &mut Cache, pos: Point) -> Option<Path> {
+    // Check for failing cases, especially those outside the `grid`
     if pos.0 < 0 || pos.1 < 0 || failed.contains(&pos) || !grid[pos.0 as usize][pos.1 as usize] {
-        return false;
+        return None;
     }
-    if pos == (0, 0)
-        || helper(grid, path, failed, (pos.0 - 1, pos.1))
-        || helper(grid, path, failed, (pos.0, pos.1 - 1))
-    {
-        // Found a path to our predecessor - so there's also a path to us.
+    if pos == (0, 0) {
+        // Base case: the origin. Start the [Path].
+        return Some(vec![pos]);
+    }
+    // Look for a path to a predecessor - if that exists, there's also a path to us.
+    if let Some(mut path) = helper(grid, failed, (pos.0 - 1, pos.1)) {
         path.push(pos);
-        return true;
+        return Some(path);
+    }
+    if let Some(mut path) = helper(grid, failed, (pos.0, pos.1 - 1)) {
+        path.push(pos);
+        return Some(path);
     }
     // No path found. Add to our failed set.
     failed.insert(pos);
-    false
+    None
 }
 #[test]
 fn test_robot_grid() {
