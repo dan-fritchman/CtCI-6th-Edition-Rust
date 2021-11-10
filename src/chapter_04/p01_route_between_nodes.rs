@@ -19,11 +19,11 @@ use super::utils::{Graph, NodePtr};
 ///
 /// Breadth-first walk outward from `src`. If we hit `dst`, there is a path.
 ///
-pub fn has_path<T>(graph: &Graph<T>, src: &NodePtr<T>, dst: &NodePtr<T>) -> Result<bool, ()> {
+pub fn has_path<T>(graph: &Graph<T>, src: &NodePtr<T>, dst: &NodePtr<T>) -> Result<bool, Error> {
     // If the graph doesn't have these nodes, `false` doesn't quite cut it. Return an [Error].
     // (Note this is our only use of `graph`.)
     if !graph.contains(src) || !graph.contains(dst) {
-        return Err(());
+        return Err(Error);
     }
     // Create the FIFO BFS queue, and previously-seen-nodes hash-set
     let mut seen = HashSet::new();
@@ -104,9 +104,7 @@ fn test_has_path() {
 /// Create a graph from a data-valued adjacency list.
 /// Returns both the graph and a mapping from labels to node-pointers.
 ///
-pub fn graph_from_adjacency<T>(
-    adj: Vec<(T, Vec<T>)>,
-) -> Result<(Graph<T>, HashMap<T, NodePtr<T>>), ()>
+pub fn graph_from_adjacency<T>(adj: Vec<(T, Vec<T>)>) -> AdjResult<T>
 where
     T: Clone + Hash + Eq,
 {
@@ -120,11 +118,19 @@ where
     }
     // And for each entry in that mapping, add edges
     for entry in adj.iter() {
-        let src = labels.get(&entry.0).ok_or(())?;
+        let src = labels.get(&entry.0).ok_or(Error)?;
         for dst_label in entry.1.iter() {
-            let dst = labels.get(dst_label).ok_or(())?;
+            let dst = labels.get(dst_label).ok_or(Error)?;
             graph.connect(src, dst);
         }
     }
     Ok((graph, labels))
 }
+
+/// Return-Type Shorthand for `graph_from_adjacency`
+/// Includes both the generated graph, and a mapping from labels to node-pointers.
+type AdjResult<T> = Result<(Graph<T>, HashMap<T, NodePtr<T>>), Error>;
+
+/// Local, Generic Error Type
+#[derive(Debug)]
+pub struct Error;
