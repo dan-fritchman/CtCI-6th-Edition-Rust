@@ -49,7 +49,7 @@ pub enum SpaceStatus {
     Filled,
 }
 
-/// Parking Space 
+/// Parking Space
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParkingSpace {
     /// Space Type
@@ -103,7 +103,7 @@ impl ParkingLevel {
         self.rows.iter().any(|row| row.fits(vehicle))
     }
     /// Park `vehicle` in the lot. Returns an [Err] if space is not available.
-    pub fn park(&mut self, vehicle: Vehicle) -> Result<(), ()> {
+    pub fn park(&mut self, _vehicle: Vehicle) -> Result<(), ParkingError> {
         todo!()
     }
 }
@@ -118,7 +118,10 @@ impl ParkingLot {
         self.levels.iter().any(|level| level.fits(vehicle))
     }
     /// Park `vehicle` in the lot. Returns an [Err] if space is not available.
-    pub fn park(&mut self, vehicle: Vehicle) -> Result<(), ()> {
+    pub fn park(&mut self, _vehicle: Vehicle) -> Result<(), ParkingError> {
         todo!()
     }
 }
+
+/// Error Type
+pub struct ParkingError;
