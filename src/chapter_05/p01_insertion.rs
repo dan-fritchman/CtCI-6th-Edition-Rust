@@ -22,7 +22,7 @@ pub fn insertion(n: u32, m: u32, i: u32, j: u32) -> Result<u32, &'static str> {
     }
 
     // Create a bit-mask of bits `j` through `i`
-    let j_thru_i = 2_u32.pow(j) - 1 ^ 2_u32.pow(i) - 1;
+    let j_thru_i = (2_u32.pow(j) - 1) ^ (2_u32.pow(i) - 1);
     // Mask off those bits of `n`
     let mut rv = n & !j_thru_i;
     // And shift in `m`

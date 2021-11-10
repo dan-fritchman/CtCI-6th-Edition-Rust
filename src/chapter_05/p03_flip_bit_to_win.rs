@@ -28,7 +28,7 @@ pub fn flip_bit_to_win(mut num: u32) -> usize {
             streaks.push(consec);
             consec = 1;
             // Flip `state` between 0 and 1
-            state = state ^ 0b1;
+            state ^= 0b1;
         }
         num >>= 1;
     }
@@ -37,7 +37,7 @@ pub fn flip_bit_to_win(mut num: u32) -> usize {
     // Handle our two special cases: all zeroes, and all ones
     // Note our many "+1" add-ons are for sake of flipping an adjacent bit,
     // including potentially the bit above the 1-valued MSB.
-    if streaks.len() == 0 {
+    if streaks.is_empty() {
         panic!("Internal Error");
     } else if streaks.len() == 1 {
         return 1; // All zeroes
