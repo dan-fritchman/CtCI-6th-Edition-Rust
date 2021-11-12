@@ -8,3 +8,5 @@ pub mod p01_number_swapper;
 pub mod p02_word_frequencies;
 pub mod p06_smallest_difference;
 pub mod p08_english_int;
+pub mod p19_pond_sizes;
+pub mod p26_calculator;
