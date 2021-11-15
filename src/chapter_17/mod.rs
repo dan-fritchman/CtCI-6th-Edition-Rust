@@ -10,3 +10,5 @@ pub mod p07_baby_names;
 pub mod p08_circus_tower;
 pub mod p09_kth_multiple;
 pub mod p15_longest_word;
+pub mod p16_the_masseuse;
+pub mod p17_multi_search;
