@@ -17,6 +17,9 @@ pub mod chapter_10;
 pub mod chapter_16;
 pub mod chapter_17;
 
+pub mod ptr;
+pub mod dijkstra;
+
 /// Library-Level Do-Nothing Test
 #[test]
 fn alive() {}
