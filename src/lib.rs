@@ -17,8 +17,10 @@ pub mod chapter_10;
 pub mod chapter_16;
 pub mod chapter_17;
 
-pub mod ptr;
 pub mod dijkstra;
+pub mod heap;
+pub mod ptr;
+pub mod sort;
 
 /// Library-Level Do-Nothing Test
 #[test]
