@@ -12,8 +12,33 @@
 //! Hints: #22, #56, #63
 //!
 
+pub enum Animal<'name> {
+    Dog(&'name str),
+    Cat(&'name str),
+}
+
+pub struct AnimalShelter;
+impl AnimalShelter {
+    pub fn new() -> Self {
+        todo!()
+    }
+    pub fn enqueue(&mut self, _a: Animal) {
+        todo!()
+    }
+    pub fn size(&self) -> usize {
+        todo!()
+    }
+}
+pub fn animal_shelter() {
+    todo!()
+}
+
 #[ignore] // FIXME!
 #[test]
 fn test_animal_shelter() {
-    todo!()
+    let mut animal_shelter = AnimalShelter::new();
+    animal_shelter.enqueue(Animal::Cat("Fluffy"));
+    animal_shelter.enqueue(Animal::Dog("Sparky"));
+    animal_shelter.enqueue(Animal::Cat("Sneezy"));
+    assert_eq!(animal_shelter.size(), 3);
 }
