@@ -7,7 +7,7 @@
 //! Hints: # 166, #203, #227, #234, #246, #280
 //!
 
-pub fn recursive_multiply(a: usize, b: usize) -> usize {
+pub fn recursive_multiply(_a: usize, _b: usize) -> usize {
     todo!()
 }
 
