@@ -9,94 +9,13 @@
 //! Hints: #20, #45, #55, #65, #76, #93, #111, #120, #129
 //!
 
+use std::collections::HashSet;
+
 // We can't really do this one with our "slot-map-style" Rustic implementation.
-// So, pull in the shared-pointer [Ptr] and make a new [List] instead.
+// So, pull in the shared-pointer [Ptr] based [List] instead.
 
-use std::{collections::HashSet, marker::PhantomData};
-
-// Local Imports
 use crate::ptr::Ptr;
-
-#[derive(Debug)]
-pub struct Node<Data = isize> {
-    data: Data,
-    next: Option<Ptr<Node>>,
-}
-#[derive(Debug)]
-pub struct List {
-    head: Option<Ptr<Node>>,
-    tail: Option<Ptr<Node>>,
-}
-impl Default for List {
-    fn default() -> Self {
-        Self {
-            head: None,
-            tail: None,
-        }
-    }
-}
-impl List {
-    /// Add a node with value `data` to the end of the list.
-    pub fn add(&mut self, data: isize) -> Ptr<Node> {
-        let node = Node { data, next: None };
-        let ptr = Ptr::new(node);
-        match self.head {
-            Some(_) => (),
-            None => self.head = Some(ptr.clone()),
-        };
-        match self.tail {
-            Some(ref mut t) => t.borrow_mut().next = Some(ptr.clone()),
-            None => (),
-        };
-        self.tail = Some(ptr.clone());
-        ptr
-    }
-    /// Add each element of a slice
-    pub fn add_slice(&mut self, sl: &[isize]) {
-        for item in sl {
-            self.add(*item);
-        }
-    }
-    /// Create from a slice or vector of [isize]
-    pub fn from_slice(sl: &[isize]) -> Self {
-        let mut this = Self::default();
-        this.add_slice(sl);
-        this
-    }
-    pub fn iter(&self) -> ListIter {
-        ListIter::new(self)
-    }
-}
-
-/// # List Iterator
-/// For our ergonomic niceties, we might as well make these iterators! (See below.)
-pub struct ListIter<'ls> {
-    /// Current node (pointer)
-    current: Option<Ptr<Node>>,
-    /// Hold a (phantom) reference to the list,
-    /// so that it may not be modified during our lifetime.
-    list: PhantomData<&'ls List>,
-}
-impl<'ls> ListIter<'ls> {
-    /// Create a [ListIter] from a [List]
-    pub fn new(list: &'ls List) -> Self {
-        Self {
-            list: PhantomData,
-            current: list.head.clone(),
-        }
-    }
-}
-impl<'ls> Iterator for ListIter<'ls> {
-    type Item = Ptr<Node>;
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut next = match self.current {
-            Some(ref p) => p.borrow().next.clone(),
-            None => return None,
-        };
-        std::mem::swap(&mut self.current, &mut next);
-        next
-    }
-}
+use crate::ptr_list::{List, Node};
 
 /// Primary Implementation
 ///

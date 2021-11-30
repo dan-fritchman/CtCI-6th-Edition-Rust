@@ -8,49 +8,7 @@
 //!
 
 // Local Imports
-use super::utils::Ptr;
-
-// Alias for a [Ptr] to a [Node]
-pub type NodePtr<T> = Ptr<Node<T>>;
-
-#[derive(Debug)]
-pub struct Node<T> {
-    data: T,
-    pub left: Option<NodePtr<T>>,
-    pub right: Option<NodePtr<T>>,
-}
-impl<T> Node<T> {
-    pub fn new(data: T) -> Self {
-        Self {
-            data,
-            left: None,
-            right: None,
-        }
-    }
-}
-/// Binary Tree
-#[derive(Debug)]
-pub struct BinaryTree<T> {
-    pub head: Option<NodePtr<T>>,
-}
-impl<T: Clone> BinaryTree<T> {
-    pub fn inorder(&self) -> Vec<T> {
-        let mut v = Vec::new();
-        self._inorder(&self.head, &mut v);
-        v
-    }
-    fn _inorder(&self, opt: &Option<NodePtr<T>>, v: &mut Vec<T>) {
-        match opt {
-            None => (),
-            Some(ptr) => {
-                let node = &ptr.borrow();
-                self._inorder(&node.left, v);
-                v.push(node.data.clone());
-                self._inorder(&node.right, v);
-            }
-        }
-    }
-}
+use crate::binary_tree::{BinaryTree, Node, NodePtr};
 
 ///
 /// Primary Implementation Method
@@ -65,7 +23,7 @@ fn minimal_tree_node(ls: &[isize]) -> Option<NodePtr<isize>> {
         return None;
     }
     let mid = ls.len() / 2;
-    let mut node = Node::new(ls[mid]);
+    let mut node = Node::new(ls[mid], None, None);
     node.left = minimal_tree_node(&ls[0..mid]);
     node.right = minimal_tree_node(&ls[mid + 1..ls.len()]);
     Some(NodePtr::new(node))
