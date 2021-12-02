@@ -17,6 +17,7 @@ pub mod chapter_10;
 pub mod chapter_16;
 pub mod chapter_17;
 
+pub mod binary_search_tree;
 pub mod binary_tree;
 pub mod dijkstra;
 pub mod heap;
