@@ -20,7 +20,7 @@ pub fn bin_decimal_to_str(mut f: f64) -> Result<String, &'static str> {
     let mut comp = 0.5;
     while f > 0.0 {
         if rv.len() > 32 + 3 {
-            // Perhaps more descriptively "too long", but this is the problem statement
+            // Perhaps more descriptively "too long", but this is the problem statement.
             // "+3" is for the header characters "b0.".
             return Err("ERROR");
         }
