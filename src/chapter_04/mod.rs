@@ -13,6 +13,9 @@ pub mod p06_successor;
 pub mod p07_build_order;
 pub mod p08_first_common_ancestor;
 pub mod p09_bst_sequences;
+pub mod p10_check_subtree;
+pub mod p11_random_node;
+pub mod p12_paths_with_sum;
 
 // Shared Utilities
 pub mod utils;
