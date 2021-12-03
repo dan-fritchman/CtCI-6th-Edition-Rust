@@ -8,11 +8,11 @@
 //! Hints: #6, #74, #52, #68, #77, #87, #94, #703, #708, #115
 //!
 
+use crate::binary_tree::BinaryTree;
 #[cfg(test)]
 use crate::binary_tree::Error;
-use crate::binary_tree::{BinaryTree, NodePtr};
 
-pub fn paths_with_sum(tree: &BinaryTree<isize>, sum: isize) -> usize {
+pub fn paths_with_sum(_tree: &BinaryTree<isize>, _sum: isize) -> usize {
     todo!()
 }
 

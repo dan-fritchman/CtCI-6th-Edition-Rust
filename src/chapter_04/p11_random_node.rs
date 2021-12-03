@@ -13,7 +13,7 @@
 use crate::binary_tree::Error;
 use crate::binary_tree::{BinaryTree, NodePtr};
 
-pub fn get_random_node<T>(tree: &BinaryTree<T>) -> NodePtr<T> {
+pub fn get_random_node<T>(_tree: &BinaryTree<T>) -> NodePtr<T> {
     todo!()
 }
 
@@ -29,7 +29,7 @@ fn test_get_random_node() -> Result<(), Error> {
     let n = bst.insert(5, Some(n))?;
     let n = bst.insert(12, Some(n))?;
     let n = bst.insert(11, Some(n))?;
-    let n = bst.insert(14, Some(n))?;
+    let _n = bst.insert(14, Some(n))?;
     // let n = bst.delete(12); // FIXME!
 
     let mut counts = HashMap::new();
