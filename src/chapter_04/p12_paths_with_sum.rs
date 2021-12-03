@@ -16,6 +16,7 @@ pub fn paths_with_sum(tree: &BinaryTree<isize>, sum: isize) -> usize {
     todo!()
 }
 
+#[ignore]
 #[test]
 fn test_paths_with_sum() -> Result<(), Error> {
     let mut t1 = BinaryTree::default();
