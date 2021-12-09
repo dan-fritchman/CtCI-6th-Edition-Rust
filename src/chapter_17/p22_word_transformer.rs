@@ -70,8 +70,8 @@ fn unwind(word: &str, from_src: &PathGraph, from_dest: &PathGraph) -> Vec<String
         next_word = node.prev;
     }
     // Pop the (initially first) entry, `word`, and reverse it.
-    src_vec.remove(0);
     src_vec.reverse();
+    src_vec.pop().unwrap();
 
     // And append the two together
     src_vec.extend(dest_vec);
