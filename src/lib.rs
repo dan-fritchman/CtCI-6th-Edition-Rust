@@ -24,6 +24,7 @@ pub mod heap;
 pub mod ptr;
 pub mod ptr_list;
 pub mod sort;
+pub mod trie;
 
 /// Library-Level Do-Nothing Test
 #[test]

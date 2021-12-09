@@ -8,11 +8,14 @@
 //!
 
 use std::collections::HashMap;
+// Local Imports
+use crate::trie::{Node, Trie, ENDCHAR};
 
 /// Primary Implementation
 ///
 /// Create a search [Trie] of the small-words list,
 /// then search `big_word` starting from each character for matches in that trie.
+/// 
 pub fn multi_search<'big, 'sm>(
     big_word: &'big str,
     small_words: &[&'sm str],
@@ -56,52 +59,6 @@ fn search(trie: &Trie, subword: &str) -> Vec<String> {
         children = &node.children;
     }
 }
-
-/// Trie used to store the collection of "short" words
-/// Stores children in a [HashMap], in which keys are equal to their `value` fields.
-#[derive(Debug, Default)]
-pub struct Trie {
-    root_nodes: HashMap<char, Node>,
-}
-impl Trie {
-    /// Create a [Trie] from a list of (short) `words`.
-    fn create(words: &[&str]) -> Self {
-        let mut trie = Self::default();
-        for word in words {
-            trie.add_word(word);
-        }
-        trie
-    }
-    /// Add string `word`, a character-node at a time. Re-use any existing char-nodes.
-    fn add_word(&mut self, word: &str) {
-        let mut chars = word.chars();
-        let c = chars.next().unwrap();
-        let mut node = self.root_nodes.entry(c).or_insert(Node::new(c));
-        for c in chars {
-            node = node.children.entry(c).or_insert(Node::new(c));
-        }
-        node.children.insert(ENDCHAR, Node::new(ENDCHAR));
-    }
-}
-
-/// [Trie] character-[Node].
-/// Stores children in a [HashMap], in which keys are equal to their `value` fields.
-#[derive(Debug, Default)]
-pub struct Node {
-    value: char,
-    children: HashMap<char, Node>,
-}
-impl Node {
-    fn new(value: char) -> Self {
-        Self {
-            value,
-            ..Default::default()
-        }
-    }
-}
-
-/// Cardinal character-value used to represent "end of word".
-const ENDCHAR: char = '*';
 
 #[test]
 fn test_multi_search() {
