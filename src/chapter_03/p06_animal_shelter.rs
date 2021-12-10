@@ -12,33 +12,72 @@
 //! Hints: #22, #56, #63
 //!
 
-pub enum Animal<'name> {
-    Dog(&'name str),
-    Cat(&'name str),
-}
+use std::collections::VecDeque;
 
-pub struct AnimalShelter;
-impl AnimalShelter {
+#[derive(Debug, PartialEq, Eq)]
+pub struct Dog<'name>(&'name str);
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct Cat<'name>(&'name str);
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Animal<'name> {
+    Dog(Dog<'name>),
+    Cat(Cat<'name>),
+}
+#[derive(Debug, Default)]
+pub struct AnimalShelter<'n> {
+    dogs: VecDeque<(Dog<'n>, usize)>,
+    cats: VecDeque<(Cat<'n>, usize)>,
+    timestamp: usize,
+}
+impl<'n> AnimalShelter<'n> {
     pub fn new() -> Self {
-        todo!()
+        Self {
+            dogs: VecDeque::new(),
+            cats: VecDeque::new(),
+            timestamp: 0,
+        }
     }
-    pub fn enqueue(&mut self, _a: Animal) {
-        todo!()
+    pub fn enqueue(&mut self, a: Animal<'n>) {
+        match a {
+            Animal::Dog(d) => self.dogs.push_back((d, self.timestamp)),
+            Animal::Cat(c) => self.cats.push_back((c, self.timestamp)),
+        }
+        self.timestamp += 1;
+    }
+    pub fn dequeue_any(&mut self) -> Option<Animal<'n>> {
+        let dog_entry = match self.dogs.get(0) {
+            Some(d) => d,
+            None => return self.dequeue_cat().map(|e| Animal::Cat(e)),
+        };
+        let cat_entry = match self.cats.get(0) {
+            Some(c) => c,
+            None => return self.dequeue_dog().map(|e| Animal::Dog(e)),
+        };
+        // We have at least one dog and cat, compare their timestamps
+        if dog_entry.1 < cat_entry.1 {
+            self.dequeue_dog().map(|e| Animal::Dog(e))
+        } else {
+            self.dequeue_cat().map(|e| Animal::Cat(e))
+        }
+    }
+    pub fn dequeue_dog(&mut self) -> Option<Dog<'n>> {
+        self.dogs.pop_front().map(|e| e.0)
+    }
+    pub fn dequeue_cat(&mut self) -> Option<Cat<'n>> {
+        self.cats.pop_front().map(|e| e.0)
     }
     pub fn size(&self) -> usize {
-        todo!()
+        self.dogs.len() + self.cats.len()
     }
 }
-pub fn animal_shelter() {
-    todo!()
-}
 
-#[ignore] // FIXME!
 #[test]
 fn test_animal_shelter() {
     let mut animal_shelter = AnimalShelter::new();
-    animal_shelter.enqueue(Animal::Cat("Fluffy"));
-    animal_shelter.enqueue(Animal::Dog("Sparky"));
-    animal_shelter.enqueue(Animal::Cat("Sneezy"));
+    animal_shelter.enqueue(Animal::Cat(Cat("Fluffy")));
+    animal_shelter.enqueue(Animal::Dog(Dog("Sparky")));
+    animal_shelter.enqueue(Animal::Cat(Cat("Sneezy")));
     assert_eq!(animal_shelter.size(), 3);
 }
