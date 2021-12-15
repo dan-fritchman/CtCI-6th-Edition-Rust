@@ -7,11 +7,18 @@
 //! Hints: #145, #248, #328, #355
 //!
 
-pub fn pairwise_swap(_n: usize) -> usize {
-    todo!()
+/// Primary Implementation
+///
+/// Filter odd and even bits, shift each by one in opposite directions,
+/// and or the two back together.
+///
+pub fn pairwise_swap(n: u32) -> u32 {
+    let evens = n & 0x5555_5555;
+    let odds = n & 0xAAAA_AAAA;
+    // Note for Rusts's unsigned integers, the shift operators perform *logical* shifts.
+    (odds >> 1) | (evens << 1)
 }
 
-#[ignore]
 #[test]
 fn test_pairwise_swap() {
     let test_cases = [(123, 183), (781, 782), (278, 553)];
