@@ -12,7 +12,7 @@
 use std::collections::HashSet;
 
 // Type Aliases
-pub type Grid = Vec<Vec<bool>>;
+pub type Grid = [Vec<bool>];
 pub type Point = (isize, isize);
 pub type Path = Vec<Point>;
 pub type Cache = HashSet<Point>;

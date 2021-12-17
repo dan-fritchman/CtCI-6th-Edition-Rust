@@ -8,7 +8,7 @@
 //! Hints: #51, #100
 //!
 
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Rotate 90 degrees clockwise, inline, running a "layer" at a time from the matrix exterior to center.
 /// Note the ultra-cool const-generic usage.

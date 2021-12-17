@@ -35,7 +35,7 @@ pub fn paths_with_sum(tree: &BinaryTree<isize>, sum: isize) -> usize {
     helper(&tree.head, &paths, sum)
 }
 /// Recursive helper
-fn helper(node: &Option<NodePtr<isize>>, paths: &Vec<Vec<isize>>, sum: isize) -> usize {
+fn helper(node: &Option<NodePtr<isize>>, paths: &[Vec<isize>], sum: isize) -> usize {
     let node = match node {
         Some(n) => n,     // Unwrap the node-pointer
         None => return 0, // Base case: null node-pointer
@@ -90,7 +90,7 @@ fn test_paths_with_sum() -> Result<(), Error> {
     let mut t1 = BinaryTree::default();
     let n1 = t1.insert(11, None)?;
     let n2 = t1.insert(1, Some(n1.clone()))?;
-    let n3 = t1.insert(10, Some(n2.clone()))?;
+    let _3 = t1.insert(10, Some(n2.clone()))?;
     assert_eq!(paths_with_sum(&t1, 12), 1);
     assert_eq!(paths_with_sum(&t1, 21), 0);
 

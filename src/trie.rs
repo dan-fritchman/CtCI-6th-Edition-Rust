@@ -26,7 +26,7 @@ impl Trie {
     pub fn add_word(&mut self, word: &str) {
         let mut children = &mut self.root_nodes;
         for c in word.chars() {
-            let node = children.entry(c).or_insert(Node::new(c));
+            let node = children.entry(c).or_insert_with(|| Node::new(c));
             children = &mut node.children;
         }
         children.insert(ENDCHAR, Node::new(ENDCHAR));

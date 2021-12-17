@@ -10,7 +10,7 @@
 use super::utils::List;
 
 ///
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Since this is a doubly-linked list, we can just count `k` elements from the tail.
 /// Returns `None` if k is greater than the length of the list.

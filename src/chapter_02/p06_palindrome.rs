@@ -10,7 +10,7 @@
 use super::utils::List;
 
 ///
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Test whether [List] `list` is a palindrome.
 /// Since [List] is doubly-linked, this just requires two pointers walking from `head` and `tail`,

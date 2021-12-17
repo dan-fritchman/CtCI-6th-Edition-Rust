@@ -228,19 +228,19 @@ impl MergeSort {
     fn merge<T: Ord + Clone + Default>(left: &[T], right: &[T], dest: &mut [T]) {
         let mut lp = 0;
         let mut rp = 0;
-        for dp in 0..dest.len() {
+        for entry in dest.iter_mut() {
             if lp < left.len() && (rp >= right.len() || left[lp] < right[rp]) {
-                dest[dp] = left[lp].clone();
+                *entry = left[lp].clone();
                 lp += 1;
             } else {
-                dest[dp] = right[rp].clone();
+                *entry = right[rp].clone();
                 rp += 1;
             }
         }
     }
     /// Copy `items` to a new [Vec]
     fn copy<T: Ord + Clone + Default>(items: &mut [T]) -> Vec<T> {
-        items.iter().map(|i| i.clone()).collect::<Vec<T>>()
+        items.to_vec()
     }
 }
 

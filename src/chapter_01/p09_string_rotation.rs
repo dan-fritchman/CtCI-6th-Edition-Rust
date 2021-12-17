@@ -14,7 +14,7 @@ fn is_substr(a: &str, b: &str) -> bool {
     b.contains(a)
 }
 
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Check whether `s2` is a rotation of `s1`, primarily by checking whether `s2` is a sub-string of twice-repeated `s1s1`.
 ///

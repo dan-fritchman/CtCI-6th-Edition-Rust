@@ -22,13 +22,13 @@ use std::collections::HashMap;
 ///
 pub fn boolean_evaluation(expr: &str, result: bool) -> usize {
     // Chop the string-based `expr` into a character array, largely so we can index single [char]s.
-    let mut chars = expr.chars().collect::<Vec<char>>();
+    let chars = expr.chars().collect::<Vec<char>>();
 
     // Create our cache
     let mut cache = HashMap::new();
 
     // And kick off the recursive call-tree
-    helper(&mut chars, result, &mut cache)
+    helper(&chars, result, &mut cache)
 }
 
 /// Primary recursive workhorse. Split at each operator and total paren-counts for each side.
@@ -65,8 +65,11 @@ fn unary(c: &char, result: bool) -> usize {
         '0' => false,
         _ => panic!("Invalid unary expression"),
     };
-    let rv = if parsed == result { 1 } else { 0 };
-    rv
+    if parsed == result {
+        1
+    } else {
+        0
+    }
 }
 
 /// Get the total for the ternary expression `left op right`

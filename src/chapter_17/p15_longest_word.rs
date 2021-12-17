@@ -19,7 +19,7 @@ use std::collections::HashMap;
 ///
 pub fn longest_word(mut words: Vec<&str>) -> Option<String> {
     // Sort the input words by length
-    words.sort_by(|a, b| a.len().cmp(&b.len()));
+    words.sort_by_key(|a| a.len());
 
     // Initialize our cache-map of known-good words
     let mut map = HashMap::new();
@@ -30,7 +30,7 @@ pub fn longest_word(mut words: Vec<&str>) -> Option<String> {
     // Now walk over each, checking whether it is composable, and replacing `rv`
     let mut rv = None;
     for word in words.iter().rev() {
-        if word.len() >= optlen(&rv) && composable(&word, &words, &mut map, true) {
+        if word.len() >= optlen(&rv) && composable(word, &words, &mut map, true) {
             rv = Some(word.to_string());
         }
     }

@@ -15,11 +15,8 @@ use crate::trie::{Node, Trie, ENDCHAR};
 ///
 /// Create a search [Trie] of the small-words list,
 /// then search `big_word` starting from each character for matches in that trie.
-/// 
-pub fn multi_search<'big, 'sm>(
-    big_word: &'big str,
-    small_words: &[&'sm str],
-) -> HashMap<String, Vec<usize>> {
+///
+pub fn multi_search(big_word: &str, small_words: &[&str]) -> HashMap<String, Vec<usize>> {
     // Create the search [Trie]
     let trie = Trie::create(small_words);
 
@@ -28,7 +25,7 @@ pub fn multi_search<'big, 'sm>(
     for idx in 0..big_word.len() {
         let hits = search(&trie, &big_word[idx..big_word.len()]);
         for s in hits {
-            rv.entry(s).or_insert(Vec::new()).push(idx);
+            rv.entry(s).or_insert_with(Vec::new).push(idx);
         }
     }
     rv

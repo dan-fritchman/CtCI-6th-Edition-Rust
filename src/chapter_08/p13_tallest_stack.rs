@@ -45,7 +45,7 @@ pub fn tallest_stack(boxes: &mut [Box]) -> usize {
     // And check starting from each box
     let mut best = 0;
     for idx in 0..boxes.len() {
-        let its = helper(&boxes, idx, &mut cache);
+        let its = helper(boxes, idx, &mut cache);
         best = best.max(its);
     }
     best

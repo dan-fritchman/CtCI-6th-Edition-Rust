@@ -16,7 +16,7 @@
 use super::utils::{List, NodeIndex};
 
 ///
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// The whole Rustic approach of our linked list - a vector with index "pointers" -
 /// kinda prevents this problem from being done as intended.

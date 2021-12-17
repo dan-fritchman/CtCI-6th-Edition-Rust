@@ -16,7 +16,7 @@ use std::hash::Hash;
 use super::utils::List;
 
 ///
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Remove duplicates from a linked list.
 /// Uses a [HashSet] to track previously-seen values.

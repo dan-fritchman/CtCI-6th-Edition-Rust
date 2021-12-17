@@ -35,8 +35,12 @@ pub fn draw_line(screen: &mut Screen, width: usize, x1: usize, x2: usize, y: usi
     // Set all full-bytes to ones (0xFF)
     let first_full_byte = (xmin / 8) + if xmin % 8 != 0 { 1 } else { 0 };
     let last_full_byte = xmax / 8;
-    for i in first_full_byte..last_full_byte {
-        the_row[i] = 0xFF;
+    for byte in the_row
+        .iter_mut()
+        .take(last_full_byte)
+        .skip(first_full_byte)
+    {
+        *byte = 0xFF;
     }
 
     // Now handle the "edge bytes".

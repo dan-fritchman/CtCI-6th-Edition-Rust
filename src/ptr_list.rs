@@ -30,14 +30,12 @@ impl List {
     pub fn add(&mut self, data: isize) -> Ptr<Node> {
         let node = Node { data, next: None };
         let ptr = Ptr::new(node);
-        match self.head {
-            Some(_) => (),
-            None => self.head = Some(ptr.clone()),
-        };
-        match self.tail {
-            Some(ref mut t) => t.borrow_mut().next = Some(ptr.clone()),
-            None => (),
-        };
+        if self.head.is_none() {
+            self.head = Some(ptr.clone());
+        }
+        if let Some(ref mut t) = self.tail {
+            t.borrow_mut().next = Some(ptr.clone());
+        }
         self.tail = Some(ptr.clone());
         ptr
     }
@@ -59,9 +57,8 @@ impl List {
     }
     /// Convert to a vector of data-elements
     pub fn to_vec(&self) -> Vec<isize> {
-        let mut iter = ListIter::new(self);
         let mut rv = Vec::new();
-        while let Some(e) = iter.next() {
+        for e in ListIter::new(self) {
             rv.push(e.borrow().data);
         }
         rv

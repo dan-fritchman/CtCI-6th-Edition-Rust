@@ -8,7 +8,7 @@
 
 use std::collections::HashSet;
 
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Take two passes through the matrix.
 /// In the first collect rows and columns to be zero'ed.
@@ -20,11 +20,11 @@ pub fn zero_matrix<const N: usize>(mat: &mut [[isize; N]; N]) {
     let mut cols_to_zero = HashSet::new();
 
     // Pass one: find the zeroes
-    for row in 0..N {
-        for col in 0..N {
-            if mat[row][col] == 0 {
-                rows_to_zero.insert(row);
-                cols_to_zero.insert(col);
+    for (rownum, row) in mat.iter().enumerate().take(N) {
+        for (colnum, entry) in row.iter().enumerate().take(N) {
+            if *entry == 0 {
+                rows_to_zero.insert(rownum);
+                cols_to_zero.insert(colnum);
             }
         }
     }
@@ -35,8 +35,8 @@ pub fn zero_matrix<const N: usize>(mat: &mut [[isize; N]; N]) {
         }
     }
     for col in cols_to_zero {
-        for row in 0..N {
-            mat[row][col] = 0;
+        for row in mat.iter_mut().take(N) {
+            row[col] = 0;
         }
     }
 }

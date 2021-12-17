@@ -49,17 +49,17 @@ impl<'n> AnimalShelter<'n> {
     pub fn dequeue_any(&mut self) -> Option<Animal<'n>> {
         let dog_entry = match self.dogs.get(0) {
             Some(d) => d,
-            None => return self.dequeue_cat().map(|e| Animal::Cat(e)),
+            None => return self.dequeue_cat().map(Animal::Cat),
         };
         let cat_entry = match self.cats.get(0) {
             Some(c) => c,
-            None => return self.dequeue_dog().map(|e| Animal::Dog(e)),
+            None => return self.dequeue_dog().map(Animal::Dog),
         };
         // We have at least one dog and cat, compare their timestamps
         if dog_entry.1 < cat_entry.1 {
-            self.dequeue_dog().map(|e| Animal::Dog(e))
+            self.dequeue_dog().map(Animal::Dog)
         } else {
-            self.dequeue_cat().map(|e| Animal::Cat(e))
+            self.dequeue_cat().map(Animal::Cat)
         }
     }
     pub fn dequeue_dog(&mut self) -> Option<Dog<'n>> {

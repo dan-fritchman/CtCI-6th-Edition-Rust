@@ -31,7 +31,7 @@ impl<'s> PaintFiller<'s> {
     /// Primary entrypoint. Create a [PaintFiller] instance and kick off its recursive `fill_helper` calls.
     fn fill(screen: &'s mut Screen, loc: &Loc, new: Color) {
         let mut this = Self::new(screen, loc, new);
-        let start = this.start.clone();
+        let start = this.start;
         this.fill_helper(&start)
     }
     /// Create a new [PainFiller]
@@ -52,7 +52,7 @@ impl<'s> PaintFiller<'s> {
         if self.done.contains(loc) || !self.inbounds(loc) {
             return; // Already done, or out-of-bounds
         }
-        self.done.insert(loc.clone());
+        self.done.insert(*loc);
         if self.screen[loc.0 as usize][loc.1 as usize] == self.orig {
             // Update the color
             self.screen[loc.0 as usize][loc.1 as usize] = self.new;

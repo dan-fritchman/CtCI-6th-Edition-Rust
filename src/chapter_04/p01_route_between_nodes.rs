@@ -15,7 +15,7 @@ use std::{
 use super::utils::{Graph, NodePtr};
 
 ///
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Breadth-first walk outward from `src`. If we hit `dst`, there is a path.
 ///

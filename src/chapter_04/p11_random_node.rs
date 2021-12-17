@@ -127,7 +127,7 @@ impl BinarySearchTree {
                 }
             }
         }
-        return Ok(newindex);
+        Ok(newindex)
     }
     /// Find the node with value `val`, if present
     pub fn find(&self, val: isize) -> Option<NodeIndex> {

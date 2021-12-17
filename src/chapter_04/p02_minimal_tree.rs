@@ -11,7 +11,7 @@
 use crate::binary_tree::{BinaryTree, Node, NodePtr};
 
 ///
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Recursively split `ls` in three:
 /// * The midpoint becomes a new node

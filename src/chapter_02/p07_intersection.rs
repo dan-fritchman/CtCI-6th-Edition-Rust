@@ -34,7 +34,7 @@ pub fn intersection(a: &List, b: &List) -> Option<Ptr<Node>> {
     // And check whether it contains each element in `b`
     for ptr in b.iter() {
         if aset.contains(&ptr) {
-            return Some(ptr.clone());
+            return Some(ptr);
         }
     }
     None // No intersection found

@@ -27,7 +27,7 @@ pub fn eight_queens() -> Vec<Board> {
 fn helper(board: &mut Board, row: usize, results: &mut Vec<Board>) {
     if row >= board.len() {
         // Made it through all eight rows - this is a valid solution.
-        return results.push(board.clone());
+        return results.push(*board);
     }
     // Check for valid columns in each of the remaining rows
     for col in 0..board.len() {
@@ -42,8 +42,8 @@ fn helper(board: &mut Board, row: usize, results: &mut Vec<Board>) {
 /// given the current state of `board`.
 fn valid(board: &Board, row: usize, col: usize) -> bool {
     // Check whether anything else is in this column
-    for r in 0..row {
-        if board[r] == col {
+    for item in board.iter().take(row) {
+        if *item == col {
             return false;
         }
     }

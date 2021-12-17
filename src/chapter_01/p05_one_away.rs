@@ -14,7 +14,7 @@
 //! Hints: #23, #97, #130
 //!
 
-/// Primary Implementation Method
+/// Primary Implementation
 ///
 /// Split up handling between three cases: same-length, diff-by-one length, and
 /// any other difference in length. The latter of which always returns false.

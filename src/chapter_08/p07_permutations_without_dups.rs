@@ -11,7 +11,7 @@
 /// Peel out a character at a time, get all permutations of the rest, and append them to the character.
 ///
 pub fn permutations_without_dups(s: &str) -> Vec<String> {
-    if s.len() == 0 {
+    if s.is_empty() {
         return vec![String::new()]; // Base case. Include the empty string so calls above can append to it.
     }
     // Recursive case.

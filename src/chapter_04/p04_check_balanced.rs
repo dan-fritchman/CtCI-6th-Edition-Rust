@@ -42,8 +42,11 @@ fn helper(ptr: &Option<NodePtr<isize>>) -> Option<usize> {
     // And sort out whether the two are balanced
     let max = left_depth.max(right_depth);
     let min = left_depth.min(right_depth);
-    let rv = if max - min < 2 { Some(max + 1) } else { None };
-    rv
+    if max - min < 2 {
+        Some(max + 1)
+    } else {
+        None
+    }
 }
 
 #[test]

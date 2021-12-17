@@ -68,7 +68,7 @@ impl BinarySearchTree {
         let newindex = self.add_node(val);
 
         let mut parent = match self.head {
-            Some(p) => p.clone(),
+            Some(p) => p,
             None => {
                 // First node. Make it our `head` pointer.
                 return self.head = Some(newindex);

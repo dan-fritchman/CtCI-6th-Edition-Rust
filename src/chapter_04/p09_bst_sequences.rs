@@ -38,7 +38,7 @@ fn helper(tree: &BinarySearchTree, ptr: &Option<NodeIndex>) -> Vec<Vec<isize>> {
     let mut results = Vec::new();
     for l in left.iter() {
         for r in right.iter() {
-            let weaved = weave(&l, &r, &[]);
+            let weaved = weave(l, r, &[]);
             results.extend(weaved);
         }
     }

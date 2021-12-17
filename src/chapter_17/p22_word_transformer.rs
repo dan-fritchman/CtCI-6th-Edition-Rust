@@ -30,7 +30,7 @@ pub fn word_transformer(src: &str, dest: &str, dict: &[&str]) -> Option<Vec<Stri
         for idx in 0..word.len() {
             wildcards
                 .entry(wildcard(word, idx))
-                .or_insert(HashSet::new())
+                .or_insert_with(HashSet::new)
                 .insert(word);
         }
     }

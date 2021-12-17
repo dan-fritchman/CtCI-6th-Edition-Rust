@@ -24,9 +24,7 @@ pub fn shuffle(deck: &mut [usize]) {
         // Select a random index from 0 to i
         let rn = rand::thread_rng().gen_range(0..i + 1);
         // And swap it with `deck[i]`
-        let temp = deck[i];
-        deck[i] = deck[rn];
-        deck[rn] = temp;
+        deck.swap(i, rn);
     }
 }
 

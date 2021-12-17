@@ -25,7 +25,7 @@ pub fn the_masseuse(appts: &[usize]) -> usize {
         sec = prev;
         prev = best_with.max(best_without);
     }
-    return prev;
+    prev
 }
 #[test]
 fn test_the_masseuse() {

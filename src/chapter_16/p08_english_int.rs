@@ -32,7 +32,7 @@ fn helper(mut i: u64) -> String {
         let power = 10_u64.pow(suffix.0);
         if i >= power {
             push_word(&mut rv, &helper(i / power));
-            push_word(&mut rv, &suffix.1);
+            push_word(&mut rv, suffix.1);
             i -= (i / power) * power;
         }
     }

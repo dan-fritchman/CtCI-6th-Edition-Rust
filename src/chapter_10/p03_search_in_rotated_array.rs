@@ -49,10 +49,9 @@ pub fn search_in_rotated_array(arr: &[isize], targ: isize) -> Option<usize> {
             return search_in_rotated_array(&arr[mid..arr.len()], targ).map(|idx| idx + mid);
         }
         // Left == Right == Mid. Need to search both halves, starting with the left.
-        match search_in_rotated_array(&arr[0..mid], targ) {
-            Some(res) => return Some(res),
-            None => (),
-        };
+        if let Some(res) = search_in_rotated_array(&arr[0..mid], targ) {
+            return Some(res);
+        }
         return search_in_rotated_array(&arr[mid..arr.len()], targ).map(|idx| idx + mid);
     }
     None // None of these cases hit - `target` was not found.

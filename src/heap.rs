@@ -47,7 +47,7 @@ impl<T: Ord> Heap<T> {
         let left = self.data.get(2 * idx + 1);
         let right = self.data.get(2 * idx + 2);
         match (left, right) {
-            (None, None) => return, // No children, nothing to swap
+            (None, None) => {} // No children, nothing to swap
             (Some(lf), None) => {
                 // Left but no right child. Swap if out of order.
                 if lf < &self.data[idx] {
@@ -58,15 +58,15 @@ impl<T: Ord> Heap<T> {
                 // Two children, potentially recursively update
                 let min = lf.min(rt).min(val);
                 if min == val {
-                    return; // Min on top, already done
+                    // Min on top, already done
                 } else if min == lf {
                     // Left-child is the min. Swap with it, and recursively sift down again.
                     self.data.swap(2 * idx + 1, idx);
-                    return self.siftdown(2 * idx + 1);
+                    self.siftdown(2 * idx + 1)
                 } else {
                     // Right-child is the min. Swap with it, and recursively sift down again.
                     self.data.swap(2 * idx + 2, idx);
-                    return self.siftdown(2 * idx + 2);
+                    self.siftdown(2 * idx + 2)
                 }
             }
             _ => unreachable!("Internal Error"), // The fourth case - right child but no left - shouldn't be possible
@@ -81,7 +81,7 @@ impl<T: Ord> Heap<T> {
         let parent = &self.data[(idx - 1) / 2];
         if val < parent {
             self.data.swap(idx, (idx - 1) / 2);
-            return self.siftup((idx - 1) / 2);
+            self.siftup((idx - 1) / 2)
         }
     }
 }

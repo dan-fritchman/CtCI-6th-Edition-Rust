@@ -185,7 +185,7 @@ pub fn solve(graph: &Graph, src: &NodePtr, dest: &NodePtr) -> Option<PathResult>
             break; // Reached the source - done
         }
         node = match previous.get(node) {
-            Some(ref n) => n,    // Get the previous node
+            Some(n) => n,        // Get the previous node
             None => return None, // No path found
         };
     }

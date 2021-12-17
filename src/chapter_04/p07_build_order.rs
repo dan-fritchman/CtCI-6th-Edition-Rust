@@ -80,7 +80,7 @@ impl<'g> TopoSorter<'g> {
         if self.pending.contains(&project) {
             return Err(CycleError); // Graph cycle!
         }
-        self.pending.insert(project.clone());
+        self.pending.insert(project);
 
         // First visit each of the project's dependencies
         for dep in self.graph.projects.get(&project).unwrap().iter() {
@@ -89,7 +89,7 @@ impl<'g> TopoSorter<'g> {
 
         // And handle the project itself, moving it from `pending` to `done` and into `order`.
         self.pending.remove(&project);
-        self.done.insert(project.clone());
+        self.done.insert(project);
         self.order.push(project);
         Ok(())
     }

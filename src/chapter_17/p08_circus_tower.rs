@@ -52,7 +52,7 @@ pub fn circus_tower(people: &mut [Person]) -> Vec<Person> {
     let mut best_index = 0;
     let mut solutions = Vec::new();
     for (idx, person) in people.iter().enumerate() {
-        let longest_at_index = best_at_index(&person, &mut solutions);
+        let longest_at_index = best_at_index(person, &solutions);
         if solutions.is_empty() || longest_at_index.len() > solutions[best_index].len() {
             best_index = idx;
         }
@@ -63,11 +63,11 @@ pub fn circus_tower(people: &mut [Person]) -> Vec<Person> {
 }
 
 /// Find the best working tower ending with `person`
-fn best_at_index(person: &Person, solutions: &Vec<Vec<Person>>) -> Vec<Person> {
+fn best_at_index(person: &Person, solutions: &[Vec<Person>]) -> Vec<Person> {
     // Find the longest existing `solution` to which `person` can be appended
     let mut best = &Vec::new();
     for solution in solutions.iter() {
-        if can_append(&solution, &person) && solution.len() > best.len() {
+        if can_append(solution, person) && solution.len() > best.len() {
             best = solution;
         }
     }
@@ -79,7 +79,7 @@ fn best_at_index(person: &Person, solutions: &Vec<Vec<Person>>) -> Vec<Person> {
 
 /// Boolean indication of whether `person` can be appended to `people`
 fn can_append(people: &[Person], person: &Person) -> bool {
-    people.is_empty() || person.can_sit_below(&people.last().unwrap())
+    people.is_empty() || person.can_sit_below(people.last().unwrap())
 }
 
 #[test]
