@@ -8,7 +8,7 @@ Credit is also due to Bryan Cantrill's 2018 QCon Presentation, [Is It Time to Re
 
 ## How to use?
 
-- The book-worth of problems is configured as a cargo library-package
+- The book-worth of problems is configured as a [cargo library-package](https://crates.io/)
 - Each chapter is a module within said package, generally named `chapter_<number>`
 - Each problem is a module within said chapter-module, generally named `p<number>_<name>`
 - Each solution generally has a single unit test
@@ -20,14 +20,17 @@ These solutions are intended to be a combo demonstration of McDowell's problems 
 
 - Above all, solve each of the problems
 - Demonstrating idiomatic Rust style and design patterns
-  - Prominent example: many of `CtCI`'s problems feature linked lists, trees, and graphs, the data structures \
-    which most commonly vex new adopters of Rust's ownership system. Solutions use a combination of popular patterns \
-    including index-references and `Rc<RefCell>`
-- Demonstrate other best language-practices, such as thorough documentation of each public entity, \
-  unit testing, linting via `clippy`, and other code-quality tools.
+  - Prominent example: many of `CtCI`'s problems feature linked lists, trees, and graphs, the data structures which most commonly vex new adopters of Rust's ownership system. Solutions use a combination of popular patterns including index-references and `Rc<RefCell>`
+- Demonstrate other best language-practices, such as thorough documentation of each public entity, unit testing, linting via `clippy`, and other code-quality tools.
 
 Less emphasis is placed on providing alternate solutions, or profiling comparative results between solutions.
 
 ## Contributions
 
-Contributions welcome! Please submit separate pull requests for each solution you work on.
+Contributions welcome! Please submit separate pull requests for each solution you work on.  
+Areas for contribution particularly include:
+
+- Adding thus-far uncovered problems. 
+- Adding test cases.
+- More Rust-idiomaticity, wherever you can find it.
+- Adding coverage or other code-quality tools, mostly as demos of how to use them.
