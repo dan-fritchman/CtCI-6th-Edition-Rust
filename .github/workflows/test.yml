@@ -37,9 +37,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Run cargo fmt
-        continue-on-error: true  # FIXME: remove
         run: cargo fmt --all -- --check
 
       - name: Run cargo clippy
-        continue-on-error: true  # FIXME: remove
         run: cargo clippy -- -D warnings
