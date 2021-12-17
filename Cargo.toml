@@ -1,9 +1,12 @@
-[package]
-name = "ctci"
-version = "0.1.0"
-edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+authors = ["Dan Fritchman <dan@fritch.mn>"]
+description = "'Cracking the Coding Interview, Sixth Edition' Rust Solutions"
+edition = "2018"
+license = "BSD-3-Clause"
+name = "ctci"
+repository = "https://github.com/dan-fritchman/CtCI-6th-Edition-Rust"
+version = "0.1.0"
 
 [dependencies]
 itertools = "0.10.1"
