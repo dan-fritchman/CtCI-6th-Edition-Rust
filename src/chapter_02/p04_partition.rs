@@ -17,7 +17,7 @@ use std::cmp::PartialOrd;
 // Local Imports
 use super::utils::List;
 
-pub fn partition<T: PartialOrd >(list: &mut List<T>, pivot: T) {
+pub fn partition<T: PartialOrd>(list: &mut List<T>, pivot: T) {
     // Create pointers into the new `left` and `right` lists
     let mut left = None;
     let mut right = None;

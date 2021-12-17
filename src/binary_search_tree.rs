@@ -1,7 +1,6 @@
-//! 
-//! # Binary Search Tree 
-//! 
-
+//!
+//! # Binary Search Tree
+//!
 
 use std::ops::{Index, IndexMut};
 

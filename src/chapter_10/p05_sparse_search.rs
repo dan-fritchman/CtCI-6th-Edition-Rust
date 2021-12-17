@@ -66,9 +66,9 @@ pub fn helper(arr: &[&str], target: &str, start: usize) -> Option<usize> {
             (None, Some(rt)) => helper(&arr[rt..arr.len()], target, start + rt),
             (Some(lf), Some(rt)) => {
                 // Now there are three possible cases:
-                // `target` is either 
-                // (a) <= than `arr[left]`, 
-                // (b) >= arr[right], or 
+                // `target` is either
+                // (a) <= than `arr[left]`,
+                // (b) >= arr[right], or
                 // (c) in-between the two.
                 // In the latter case we fail, since we've established there are no non-empty elements between the two.
                 if target <= arr[lf] {

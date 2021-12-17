@@ -182,7 +182,7 @@ fn test_calculator() {
     assert_eq!(calculator(&s).unwrap(), 23.5);
 
     let s = "2-6-7*8/2+5";
-    assert_eq!(calculator(&s).unwrap(), -27.); 
+    assert_eq!(calculator(&s).unwrap(), -27.);
 }
 
 /// Local Error Type

@@ -21,7 +21,7 @@ use super::utils::List;
 /// Note this does about 2x as many comparisons as it would need to in theory,
 /// as it could stop at the list's "midpoint" instead of traversing all the way across.
 ///
-pub fn is_palindrome<T: PartialEq >(list: &List<T>) -> bool {
+pub fn is_palindrome<T: PartialEq>(list: &List<T>) -> bool {
     // Initialize forward and backward pointers
     let mut head = list.head;
     let mut tail = list.tail;

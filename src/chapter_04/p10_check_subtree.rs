@@ -14,7 +14,6 @@
 use crate::binary_tree::Error;
 use crate::binary_tree::{BinaryTree, NodePtr};
 
-
 /// Primary Implementation
 ///
 /// Search `t1` for nodes equal to `t2`'s root.
