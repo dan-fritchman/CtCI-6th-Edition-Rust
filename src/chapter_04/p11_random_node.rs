@@ -53,7 +53,7 @@ pub struct NodeIndex(usize);
 pub struct BinarySearchTree {
     pub nodes: Vec<Node>,
     pub head: Option<NodeIndex>,
-} 
+}
 impl Index<NodeIndex> for BinarySearchTree {
     type Output = Node;
     fn index(&self, index: NodeIndex) -> &Node {
