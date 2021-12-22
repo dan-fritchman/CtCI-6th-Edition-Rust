@@ -43,16 +43,9 @@ impl Edge {
 }
 
 /// Directed Graph
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Graph {
     nodes: HashSet<NodePtr>,
-}
-impl Default for Graph {
-    fn default() -> Self {
-        Self {
-            nodes: HashSet::new(),
-        }
-    }
 }
 impl Graph {
     /// Insert a [Node] with data-value `data` into the graph, returning a [NodePtr] to it.

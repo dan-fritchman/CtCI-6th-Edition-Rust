@@ -49,19 +49,11 @@ impl Node {
 pub struct NodeIndex(usize);
 
 /// Binary Tree
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BinarySearchTree {
     pub nodes: Vec<Node>,
     pub head: Option<NodeIndex>,
-}
-impl Default for BinarySearchTree {
-    fn default() -> Self {
-        Self {
-            nodes: Vec::new(),
-            head: None,
-        }
-    }
-}
+} 
 impl Index<NodeIndex> for BinarySearchTree {
     type Output = Node;
     fn index(&self, index: NodeIndex) -> &Node {

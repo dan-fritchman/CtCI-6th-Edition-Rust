@@ -52,7 +52,7 @@ pub struct SynonymGraph {
 /// Name and a [HashSet] of (direct) neighbors
 #[derive(Debug, Default)]
 pub struct Node {
-    name: String,
+    _name: String,
     edges: HashSet<String>,
 }
 impl SynonymGraph {
@@ -72,7 +72,7 @@ impl SynonymGraph {
         self.nodes
             .entry(name.to_string())
             .or_insert_with(|| Node {
-                name: name.to_string(),
+                _name: name.to_string(),
                 edges: HashSet::new(),
             })
             .edges

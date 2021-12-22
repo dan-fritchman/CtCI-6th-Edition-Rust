@@ -12,18 +12,10 @@ pub struct Node<Data = isize> {
     pub data: Data,
     pub next: Option<Ptr<Node>>,
 }
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct List {
     pub head: Option<Ptr<Node>>,
     pub tail: Option<Ptr<Node>>,
-}
-impl Default for List {
-    fn default() -> Self {
-        Self {
-            head: None,
-            tail: None,
-        }
-    }
 }
 impl List {
     /// Add a node with value `data` to the end of the list.
