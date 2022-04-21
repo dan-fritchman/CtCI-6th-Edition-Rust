@@ -9,5 +9,7 @@ repository = "https://github.com/dan-fritchman/CtCI-6th-Edition-Rust"
 version = "0.1.0"
 
 [dependencies]
+by_address = "1.0.4"
 itertools = "0.10.1"
 rand = "0.8.4"
+typed-arena = "2.0.1"

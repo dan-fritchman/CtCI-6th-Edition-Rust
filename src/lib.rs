@@ -25,6 +25,7 @@ pub mod ptr;
 pub mod ptr_list;
 pub mod sort;
 pub mod trie;
+pub mod arena_graph;
 
 /// Library-Level Do-Nothing Test
 #[test]
