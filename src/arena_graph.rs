@@ -22,15 +22,15 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// # Internal Reference Type
 ///
-/// Used to make all edge-node references.
+/// Used to make all edge and node references.
 /// Returned by [`Graph::add_node`] and [`Graph::add_edge`]
 /// to enable further access and manipulation.
 ///
 pub struct Ref<'g, T>(ByAddress<&'g T>);
 
-impl<'r, T> Ref<'r, T> {
+impl<'g, T> Ref<'g, T> {
     /// Pointer Constructor
-    pub fn new(i: &'r T) -> Self {
+    pub fn new(i: &'g T) -> Self {
         Self(ByAddress(i))
     }
     /// Get the address of this reference
@@ -38,54 +38,50 @@ impl<'r, T> Ref<'r, T> {
         &*self.0 .0
     }
 }
-impl<'r, T> Deref for Ref<'r, T> {
+impl<'g, T> Deref for Ref<'g, T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
         &self.0 .0
     }
 }
 // Having a [Deref] implementation seems to screw with the auto-`derive`d implementations
-// of a few key traits. Conveniently, they're all quite short.
-impl<'r, T> Clone for Ref<'r, T> {
+// of a few key traits. Conveniently, they'ge all quite short.
+impl<'g, T> Clone for Ref<'g, T> {
     fn clone(&self) -> Self {
         Self(ByAddress::clone(&self.0))
     }
 }
-impl<'r, T> Copy for Ref<'r, T> {}
+impl<'g, T> Copy for Ref<'g, T> {}
 
-impl<'r, T> PartialEq for Ref<'r, T> {
+impl<'g, T> PartialEq for Ref<'g, T> {
     fn eq(&self, other: &Self) -> bool {
         self.0.eq(&other.0)
     }
 }
-impl<'r, T> Eq for Ref<'r, T> {}
-impl<'r, T> Hash for Ref<'r, T> {
+impl<'g, T> Eq for Ref<'g, T> {}
+impl<'g, T> Hash for Ref<'g, T> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.0.hash(state)
     }
 }
 
 /// Type alias for references to nodes
-type NodeRef<'r> = Ref<'r, Node<'r>>;
+type NodeRef<'g, N, E> = Ref<'g, Node<'g, N, E>>;
 /// Type alias for references to edges
-type EdgeRef<'r> = Ref<'r, Edge<'r>>;
-
-#[derive(Debug, Default, Clone)]
-pub struct NodeData; // FIXME! Real content
+type EdgeRef<'g, N, E> = Ref<'g, Edge<'g, N, E>>;
 
 #[derive(Clone)]
-pub struct EdgeList<'r>(RefCell<Vec<EdgeRef<'r>>>);
+pub struct EdgeList<'g, N, E>(RefCell<Vec<EdgeRef<'g, N, E>>>);
 
 /// Graph Node
 /// Data type is `char`, a short "name" for each node.
-#[derive(Clone)]
-pub struct Node<'r> {
-    data: NodeData,
-    outgoing: EdgeList<'r>,
-    incoming: EdgeList<'r>,
+pub struct Node<'g, N, E> {
+    data: N,
+    outgoing: EdgeList<'g, N, E>,
+    incoming: EdgeList<'g, N, E>,
 }
-impl<'r> Node<'r> {
-    pub fn new(data: NodeData) -> Self {
+impl<'g, N, E> Node<'g, N, E> {
+    pub fn new(data: N) -> Self {
         Self {
             data,
             outgoing: EdgeList(RefCell::new(Vec::new())),
@@ -94,106 +90,132 @@ impl<'r> Node<'r> {
     }
 }
 
-#[derive(Debug, Default, Clone)]
-pub struct EdgeData; // FIXME! Real content
-
 /// Directed Edge
-#[derive(Debug, Clone)]
-pub struct Edge<'r> {
-    pub data: EdgeData,
-    pub src: NodeRef<'r>,
-    pub dst: NodeRef<'r>,
+pub struct Edge<'g, N, E> {
+    pub data: E,
+    pub src: NodeRef<'g, N, E>,
+    pub dst: NodeRef<'g, N, E>,
 }
-impl<'r> Edge<'r> {
-    fn new(data: EdgeData, src: NodeRef<'r>, dst: NodeRef<'r>) -> Self {
+impl<'g, N, E> Edge<'g, N, E> {
+    fn new(data: E, src: NodeRef<'g, N, E>, dst: NodeRef<'g, N, E>) -> Self {
         Self { data, src, dst }
     }
 }
 
-struct ArenaWrapper<T>(Arena<T>);
-impl<'g, T> ArenaWrapper<T> {
+/// # Arena Wrapper
+/// A light wrapper around [`typed_arena::Arena`] which:
+///
+/// * Converts the output of `alloc` from mutable to immutable references
+/// * Keeps a hash-set of all [`Ref`]s created by `alloc`
+///
+struct ArenaWrapper<'g, T> {
+    arena: Arena<T>,
+    refs: RefCell<HashSet<Ref<'g, T>>>,
+}
+impl<'g, T> ArenaWrapper<'g, T> {
     fn new() -> Self {
-        Self(Arena::new())
+        Self {
+            arena: Arena::new(),
+            refs: RefCell::new(HashSet::new()),
+        }
     }
     fn alloc(&'g self, data: T) -> Ref<'g, T> {
-        let inner = self.0.alloc(data) as &T;
-        Ref::new(inner)
+        let inner = self.arena.alloc(data) as &T;
+        let rf = Ref::new(inner);
+        self.refs.borrow_mut().insert(rf.clone());
+        rf
     }
 }
 
-/// Graph
-pub struct Graph<'r> {
-    nodes: ArenaWrapper<Node<'r>>,
-    noderefs: RefCell<HashSet<NodeRef<'r>>>,
-    edges: ArenaWrapper<Edge<'r>>,
-    edgerefs: RefCell<HashSet<EdgeRef<'r>>>,
+/// # Directed Graph
+///
+/// Parameterized by the types of node-data `N` and edge-data `E`.
+/// Both default to the unit type `()`, indicating no data.
+///
+pub struct Graph<'g, N = (), E = ()> {
+    nodes: ArenaWrapper<'g, Node<'g, N, E>>,
+    edges: ArenaWrapper<'g, Edge<'g, N, E>>,
 }
-impl<'r> Graph<'r> {
+impl<'g, N, E> Graph<'g, N, E> {
+    /// Create a new, initially empty graph
     pub fn new() -> Self {
         Self {
             nodes: ArenaWrapper::new(),
-            noderefs: RefCell::new(HashSet::new()),
             edges: ArenaWrapper::new(),
-            edgerefs: RefCell::new(HashSet::new()),
         }
     }
-    pub fn add_node(&'r self, node: Node<'r>) -> NodeRef<'r> {
-        let rf = self.nodes.alloc(node);
-        self.noderefs.borrow_mut().insert(rf.clone());
-        rf
+    /// Create and add a new [`Node`] from node-data `n`.
+    /// Returns a [`Ref`] to the newly created node.
+    pub fn create_node(&'g self, n: N) -> NodeRef<'g, N, E> {
+        self.add_node(Node::new(n))
     }
-    pub fn add_edge(&'r self, edge: Edge<'r>) -> EdgeRef<'r> {
+    /// Add a [`Node`] to the graph.
+    /// Returns a [`Ref`] to the node.
+    pub fn add_node(&'g self, node: Node<'g, N, E>) -> NodeRef<'g, N, E> {
+        self.nodes.alloc(node)
+    }
+    /// Create and add a new edge from edge-data `e` and [`Node`] references `src and `dst`.
+    /// Returns a [`Ref`] to the newly created edge.
+    pub fn create_edge(
+        &'g self,
+        e: E,
+        src: &NodeRef<'g, N, E>,
+        dst: &NodeRef<'g, N, E>,
+    ) -> EdgeRef<'g, N, E> {
+        let edge = Edge::new(e, src.clone(), dst.clone());
+        self.add_edge(edge)
+    }
+    /// Add an [`Edge`] to the graph.
+    /// Returns a [`Ref`] to the edge.
+    pub fn add_edge(&'g self, edge: Edge<'g, N, E>) -> EdgeRef<'g, N, E> {
         let edgeref = self.edges.alloc(edge);
         edgeref.src.outgoing.0.borrow_mut().push(edgeref.clone());
         edgeref.dst.incoming.0.borrow_mut().push(edgeref.clone());
-        self.edgerefs.borrow_mut().insert(edgeref.clone());
         edgeref
     }
-    pub fn add_something(&'r self, _c: char) -> NodeRef<'r> {
-        self.add_node(Node::new(NodeData))
-    }
-    pub fn connect(&'r self, _x: usize, src: &NodeRef<'r>, dst: &NodeRef<'r>) -> EdgeRef<'r> {
-        let edge = Edge::new(EdgeData, src.clone(), dst.clone());
-        self.add_edge(edge)
-    }
-    pub fn weight(&'r self, _edge: &EdgeRef<'r>) -> usize {
-        1 // FIXME! Real weight
+    pub fn weight(&'g self, edge: &EdgeRef<'g, N, E>) -> usize {
+        1 // FIXME! real edge weights for other edge-data types
     }
 }
+// impl<'g, N> Graph<'g, N, usize> {
+//     pub fn weight(&'g self, edge: &EdgeRef<'g, N, usize>) -> usize {
+//         edge.data
+//     }
+// }
 
 #[test]
 fn test_dijkstra() {
-    let graph = Graph::new();
+    let graph = Graph::<char, usize>::new();
 
-    let a = graph.add_something('a');
-    let b = graph.add_something('b');
-    let c = graph.add_something('c');
-    let d = graph.add_something('d');
-    let e = graph.add_something('e');
-    let f = graph.add_something('f');
-    let g = graph.add_something('g');
-    let h = graph.add_something('h');
-    let i = graph.add_something('i');
+    let a = graph.create_node('a');
+    let b = graph.create_node('b');
+    let c = graph.create_node('c');
+    let d = graph.create_node('d');
+    let e = graph.create_node('e');
+    let f = graph.create_node('f');
+    let g = graph.create_node('g');
+    let h = graph.create_node('h');
+    let i = graph.create_node('i');
 
-    graph.connect(5, &a, &b);
-    graph.connect(3, &a, &c);
-    graph.connect(2, &a, &e);
-    graph.connect(2, &b, &d);
-    graph.connect(1, &c, &b);
-    graph.connect(1, &c, &d);
-    graph.connect(1, &d, &a);
-    graph.connect(2, &d, &g);
-    graph.connect(1, &d, &h);
-    graph.connect(1, &e, &a);
-    graph.connect(4, &e, &h);
-    graph.connect(7, &e, &i);
-    graph.connect(3, &f, &b);
-    graph.connect(1, &f, &g);
-    graph.connect(3, &g, &c);
-    graph.connect(2, &g, &i);
-    graph.connect(2, &h, &c);
-    graph.connect(2, &h, &f);
-    graph.connect(2, &h, &g);
+    graph.create_edge(5, &a, &b);
+    graph.create_edge(3, &a, &c);
+    graph.create_edge(2, &a, &e);
+    graph.create_edge(2, &b, &d);
+    graph.create_edge(1, &c, &b);
+    graph.create_edge(1, &c, &d);
+    graph.create_edge(1, &d, &a);
+    graph.create_edge(2, &d, &g);
+    graph.create_edge(1, &d, &h);
+    graph.create_edge(1, &e, &a);
+    graph.create_edge(4, &e, &h);
+    graph.create_edge(7, &e, &i);
+    graph.create_edge(3, &f, &b);
+    graph.create_edge(1, &f, &g);
+    graph.create_edge(3, &g, &c);
+    graph.create_edge(2, &g, &i);
+    graph.create_edge(2, &h, &c);
+    graph.create_edge(2, &h, &f);
+    graph.create_edge(2, &h, &g);
 
     dbg!(&graph);
 
@@ -211,27 +233,27 @@ fn test_dijkstra() {
 
 /// Node + Score Combination, used in the priority heap
 /// Inverts comparison order to make the std-lib max-heap serve as a min-heap.
-struct NodeScore<'r, N> {
-    node: Ref<'r, N>,
+struct NodeScore<'g, N> {
+    node: Ref<'g, N>,
     score: usize,
 }
-impl<'r, N> NodeScore<'r, N> {
-    pub fn new(node: Ref<'r, N>, score: usize) -> Self {
+impl<'g, N> NodeScore<'g, N> {
+    pub fn new(node: Ref<'g, N>, score: usize) -> Self {
         Self { node, score }
     }
 }
-impl<'r, N> PartialEq for NodeScore<'r, N> {
+impl<'g, N> PartialEq for NodeScore<'g, N> {
     fn eq(&self, other: &Self) -> bool {
         self.cmp(other) == Ordering::Equal
     }
 }
-impl<'r, N> Eq for NodeScore<'r, N> {}
-impl<'r, N> PartialOrd for NodeScore<'r, N> {
+impl<'g, N> Eq for NodeScore<'g, N> {}
+impl<'g, N> PartialOrd for NodeScore<'g, N> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
-impl<'r, N> Ord for NodeScore<'r, N> {
+impl<'g, N> Ord for NodeScore<'g, N> {
     fn cmp(&self, other: &Self) -> Ordering {
         // Priority reversal happens here, with the order of `self` and `other`
         other.score.cmp(&self.score)
@@ -240,23 +262,23 @@ impl<'r, N> Ord for NodeScore<'r, N> {
 
 /// Dijkstra-Based Shortest-Path Solver,
 /// from `src` to `dst` in [Graph] `graph`.
-pub fn dijkstra<'r>(
-    graph: &'r Graph<'r>,
-    src: &NodeRef<'r>,
-    dst: &NodeRef<'r>,
-) -> Option<PathResult<'r>> {
-    if !graph.noderefs.borrow().contains(src) || !graph.noderefs.borrow().contains(dst) {
+pub fn dijkstra<'g, N: Clone, E: Clone>(
+    graph: &'g Graph<'g, N, E>,
+    src: &NodeRef<'g, N, E>,
+    dst: &NodeRef<'g, N, E>,
+) -> Option<PathResult<'g, N, E>> {
+    if !graph.nodes.refs.borrow().contains(src) || !graph.nodes.refs.borrow().contains(dst) {
         return None; // Check that the two nodes are in `graph`, or fail.
     }
 
     // Initialize the remaining-queue and path-weight-map
-    let mut q: BinaryHeap<NodeScore<'r, Node>> = BinaryHeap::new();
+    let mut q: BinaryHeap<NodeScore<'g, Node<'g, N, E>>> = BinaryHeap::new();
     q.push(NodeScore::new(src.clone(), 0));
-    let mut weights: HashMap<Ref<'r, Node>, usize> = HashMap::new();
+    let mut weights: HashMap<NodeRef<'g, N, E>, usize> = HashMap::new();
     weights.insert(src.clone(), 0);
 
     // And initialize the previous-nodes mapping
-    let mut previous: HashMap<Ref<'r, Node>, PathStep<'r>> = HashMap::new();
+    let mut previous: HashMap<NodeRef<'g, N, E>, PathStep<'g, N, E>> = HashMap::new();
 
     // The primary search loop
     while let Some(NodeScore { node, score }) = q.pop() {
@@ -285,15 +307,15 @@ pub fn dijkstra<'r>(
 
     // Now unwind the path from `dst` back to `src`
     let mut steps = Vec::new();
-    let mut step: &PathStep<'r> = previous.get(dst).unwrap();
+    let mut step: PathStep<'g, N, E> = previous.get(dst).cloned().unwrap();
     loop {
         steps.push(step.clone()); // Add the step to our path
         if step.node == *src {
             break; // Reached the source - done
         }
         step = match previous.get(&step.node) {
-            Some(s) => s,        // Get the previous step
-            None => return None, // No path found
+            Some(s) => s.clone(), // Get the previous step
+            None => return None,  // No path found
         };
     }
     // Reverse the traversed `path`, ordering from `src` to `dst`
@@ -310,18 +332,18 @@ pub fn dijkstra<'r>(
 
 /// Step in a path, including a node and edge
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct PathStep<'r> {
-    node: NodeRef<'r>,
-    edge: EdgeRef<'r>,
+pub struct PathStep<'g, N, E> {
+    node: NodeRef<'g, N, E>,
+    edge: EdgeRef<'g, N, E>,
 }
 
 /// Result from a successful shortest-path search
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct PathResult<'r> {
+pub struct PathResult<'g, N, E> {
     cost: usize,
-    steps: Vec<PathStep<'r>>,
-    src: NodeRef<'r>,
-    dst: NodeRef<'r>,
+    steps: Vec<PathStep<'g, N, E>>,
+    src: NodeRef<'g, N, E>,
+    dst: NodeRef<'g, N, E>,
 }
 
 /// # Debug Printing Module
@@ -367,7 +389,7 @@ mod debug {
     use super::*;
     use std::fmt::{Debug, Formatter, Result};
 
-    impl<'r> Debug for NodeRef<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for NodeRef<'g, N, E> {
         /// Print the "full" content of a [`Node`], including its address, data, and edges.
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_struct("Node")
@@ -378,7 +400,7 @@ mod debug {
                 .finish()
         }
     }
-    impl<'r> Debug for NodeSummary<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for NodeSummary<'g, N, E> {
         /// Print the "summary" content of a [`Node`], including its address and data but not its edges.
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_struct("Node")
@@ -387,7 +409,7 @@ mod debug {
                 .finish()
         }
     }
-    impl<'r> Debug for EdgeRef<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for EdgeRef<'g, N, E> {
         /// Print the "full" content of an [`Edge`], including its address, data, and connected nodes.
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_struct("Edge")
@@ -398,7 +420,7 @@ mod debug {
                 .finish()
         }
     }
-    impl<'r> Debug for EdgeSummary<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for EdgeSummary<'g, N, E> {
         /// Print the "summary" content of an [`Edge`], including its address and data but not its connected nodes.
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_struct("Edge")
@@ -407,12 +429,12 @@ mod debug {
                 .finish()
         }
     }
-    impl<'r> Debug for EdgeList<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for EdgeList<'g, N, E> {
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_list().entries(self.0.borrow().iter()).finish()
         }
     }
-    impl<'r> Debug for PathStep<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for PathStep<'g, N, E> {
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_struct("Step")
                 .field("node", &self.node)
@@ -420,17 +442,15 @@ mod debug {
                 .finish()
         }
     }
-    impl<'r> Debug for PathResult<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for PathResult<'g, N, E> {
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
             f.debug_list().entries(self.steps.iter()).finish()
         }
     }
-    impl<'r> Debug for Graph<'r> {
+    impl<'g, N: Debug, E: Debug> Debug for Graph<'g, N, E> {
         fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-            let nodes: Vec<NodeRef<'_>> =
-                self.noderefs.borrow().iter().map(|n| n.clone()).collect();
-            let edges: Vec<EdgeRef<'_>> =
-                self.edgerefs.borrow().iter().map(|n| n.clone()).collect();
+            let nodes: Vec<_> = self.nodes.refs.borrow().iter().map(|n| n.clone()).collect();
+            let edges: Vec<_> = self.edges.refs.borrow().iter().map(|n| n.clone()).collect();
             f.debug_struct("Graph")
                 .field("nodes", &nodes)
                 .field("edges", &edges)
@@ -440,13 +460,13 @@ mod debug {
 
     /// Private type for "summarizing" the content of a node,
     /// solely for [`Debug`] printing purposes.
-    struct NodeSummary<'r>(NodeRef<'r>);
+    struct NodeSummary<'g, N, E>(NodeRef<'g, N, E>);
     /// Private type for "summarizing" the content of an edge,
     /// solely for [`Debug`] printing purposes.
-    struct EdgeSummary<'r>(EdgeRef<'r>);
+    struct EdgeSummary<'g, N, E>(EdgeRef<'g, N, E>);
 
     /// "Summarize" a list of edges ([`EdgeList`]) as a vector of [`EdgeSummary`]s.
-    fn summarize<'l>(elist: &EdgeList<'l>) -> Vec<EdgeSummary<'l>> {
+    fn summarize<'g, N, E>(elist: &EdgeList<'g, N, E>) -> Vec<EdgeSummary<'g, N, E>> {
         elist
             .0
             .borrow()
