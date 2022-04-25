@@ -10,11 +10,10 @@ use std::{
     cmp::Ordering,
     collections::{BinaryHeap, HashMap, HashSet},
     hash::{Hash, Hasher},
-    ops::{Deref, DerefMut},
+    ops::Deref,
 };
 
 // Crates.io Imports
-use by_address::ByAddress;
 use typed_arena::Arena;
 
 pub struct Error;
@@ -26,42 +25,43 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// Returned by [`Graph::add_node`] and [`Graph::add_edge`]
 /// to enable further access and manipulation.
 ///
-pub struct Ref<'g, T>(ByAddress<&'g T>);
+#[derive(Debug)]
+pub struct Ref<'g, T>(&'g T);
 
 impl<'g, T> Ref<'g, T> {
-    /// Pointer Constructor
+    /// Reference Constructor
     pub fn new(i: &'g T) -> Self {
-        Self(ByAddress(i))
+        Self(i)
     }
     /// Get the address of this reference
     pub(crate) fn addr(&self) -> *const T {
-        &*self.0 .0
+        &*self.0 as *const T
     }
 }
 impl<'g, T> Deref for Ref<'g, T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
-        &self.0 .0
+        &self.0
     }
 }
 // Having a [Deref] implementation seems to screw with the auto-`derive`d implementations
 // of a few key traits. Conveniently, they'ge all quite short.
 impl<'g, T> Clone for Ref<'g, T> {
     fn clone(&self) -> Self {
-        Self(ByAddress::clone(&self.0))
+        Self(self.0.clone())
     }
 }
 impl<'g, T> Copy for Ref<'g, T> {}
 
 impl<'g, T> PartialEq for Ref<'g, T> {
     fn eq(&self, other: &Self) -> bool {
-        self.0.eq(&other.0)
+        self.addr() == other.addr()
     }
 }
 impl<'g, T> Eq for Ref<'g, T> {}
 impl<'g, T> Hash for Ref<'g, T> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.hash(state)
+        self.addr().hash(state)
     }
 }
 
@@ -146,8 +146,8 @@ impl<'g, N, E> Graph<'g, N, E> {
     }
     /// Create and add a new [`Node`] from node-data `n`.
     /// Returns a [`Ref`] to the newly created node.
-    pub fn create_node(&'g self, n: N) -> NodeRef<'g, N, E> {
-        self.add_node(Node::new(n))
+    pub fn create_node(&'g self, n: impl Into<N>) -> NodeRef<'g, N, E> {
+        self.add_node(Node::new(n.into()))
     }
     /// Add a [`Node`] to the graph.
     /// Returns a [`Ref`] to the node.
@@ -173,19 +173,36 @@ impl<'g, N, E> Graph<'g, N, E> {
         edgeref.dst.incoming.0.borrow_mut().push(edgeref.clone());
         edgeref
     }
-    pub fn weight(&'g self, edge: &EdgeRef<'g, N, E>) -> usize {
-        1 // FIXME! real edge weights for other edge-data types
-    }
+    // pub fn weight(&'g self, edge: &EdgeRef<'g, N, E>) -> usize {
+    //     edge.data as usize // FIXME! 1 // FIXME! real edge weights for other edge-data types
+    // }
 }
-// impl<'g, N> Graph<'g, N, usize> {
-//     pub fn weight(&'g self, edge: &EdgeRef<'g, N, usize>) -> usize {
-//         edge.data
+// impl<'g, N, E: EdgeWeight> Graph<'g, N, E> {
+//     pub fn weight(&'g self, edge: &EdgeRef<'g, N, E>) -> usize {
+//         edge.weight()
 //     }
 // }
 
+pub trait EdgeWeight {
+    type Edge;
+    fn weight(&self, edge: &Self::Edge) -> usize;
+}
+impl<'g, N> EdgeWeight for Graph<'g, N, usize> {
+    type Edge = EdgeRef<'g, N, usize>;
+    fn weight(&self, edge: &Self::Edge) -> usize {
+        edge.data
+    }
+}
 #[test]
 fn test_dijkstra() {
-    let graph = Graph::<char, usize>::new();
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    struct CharHolder(char);
+    impl From<char> for CharHolder {
+        fn from(c: char) -> Self {
+            Self(c)
+        }
+    }
+    let graph = Graph::<CharHolder, usize>::new();
 
     let a = graph.create_node('a');
     let b = graph.create_node('b');
@@ -197,38 +214,44 @@ fn test_dijkstra() {
     let h = graph.create_node('h');
     let i = graph.create_node('i');
 
-    graph.create_edge(5, &a, &b);
-    graph.create_edge(3, &a, &c);
-    graph.create_edge(2, &a, &e);
-    graph.create_edge(2, &b, &d);
-    graph.create_edge(1, &c, &b);
-    graph.create_edge(1, &c, &d);
-    graph.create_edge(1, &d, &a);
-    graph.create_edge(2, &d, &g);
-    graph.create_edge(1, &d, &h);
-    graph.create_edge(1, &e, &a);
-    graph.create_edge(4, &e, &h);
-    graph.create_edge(7, &e, &i);
-    graph.create_edge(3, &f, &b);
-    graph.create_edge(1, &f, &g);
-    graph.create_edge(3, &g, &c);
-    graph.create_edge(2, &g, &i);
-    graph.create_edge(2, &h, &c);
-    graph.create_edge(2, &h, &f);
-    graph.create_edge(2, &h, &g);
+    let _e = graph.create_edge(5, &a, &b);
+    let e1 = graph.create_edge(3, &a, &c);
+    let _e = graph.create_edge(2, &a, &e);
+    let _e = graph.create_edge(2, &b, &d);
+    let _e = graph.create_edge(1, &c, &b);
+    let e5 = graph.create_edge(1, &c, &d);
+    let _e = graph.create_edge(1, &d, &a);
+    let e7 = graph.create_edge(2, &d, &g);
+    let _e = graph.create_edge(1, &d, &h);
+    let _e = graph.create_edge(1, &e, &a);
+    let _e = graph.create_edge(4, &e, &h);
+    let _e = graph.create_edge(7, &e, &i);
+    let _e = graph.create_edge(3, &f, &b);
+    let _e = graph.create_edge(1, &f, &g);
+    let _e = graph.create_edge(3, &g, &c);
+    let e15 = graph.create_edge(2, &g, &i);
+    let _e = graph.create_edge(2, &h, &c);
+    let _e = graph.create_edge(2, &h, &f);
+    let _e = graph.create_edge(2, &h, &g);
 
     dbg!(&graph);
-
     let res = dijkstra(&graph, &a, &i);
-    dbg!(res);
-    // assert_eq!(
-    //     res,
-    //     None
-    //     // Some(PathResult {
-    //     //     cost: 8,
-    //     //     path: vec!['a', 'c', 'd', 'g', 'i']
-    //     // })
-    // )
+    dbg!(&res);
+    assert_eq!(
+        res,
+        Some(PathResult {
+            cost: 8,
+            src: a.clone(),
+            dst: i.clone(),
+            steps: vec![
+                // FIXME: all these `some_edge`s are the wrong edges
+                PathStep::new(a, e1),
+                PathStep::new(c, e5),
+                PathStep::new(d, e7),
+                PathStep::new(g, e15),
+            ]
+        })
+    )
 }
 
 /// Node + Score Combination, used in the priority heap
@@ -262,14 +285,19 @@ impl<'g, N> Ord for NodeScore<'g, N> {
 
 /// Dijkstra-Based Shortest-Path Solver,
 /// from `src` to `dst` in [Graph] `graph`.
-pub fn dijkstra<'g, N: Clone, E: Clone>(
-    graph: &'g Graph<'g, N, E>,
+pub fn dijkstra<'g, G, N, E>(
+    graph: &'g G,
     src: &NodeRef<'g, N, E>,
     dst: &NodeRef<'g, N, E>,
-) -> Option<PathResult<'g, N, E>> {
-    if !graph.nodes.refs.borrow().contains(src) || !graph.nodes.refs.borrow().contains(dst) {
-        return None; // Check that the two nodes are in `graph`, or fail.
-    }
+) -> Option<PathResult<'g, N, E>>
+where
+    N: Clone,
+    E: Clone,
+    G: EdgeWeight<Edge = EdgeRef<'g, N, E>>,
+{
+    // if !graph.nodes.refs.borrow().contains(src) || !graph.nodes.refs.borrow().contains(dst) {
+    //     return None; // Check that the two nodes are in `graph`, or fail.
+    // }
 
     // Initialize the remaining-queue and path-weight-map
     let mut q: BinaryHeap<NodeScore<'g, Node<'g, N, E>>> = BinaryHeap::new();
@@ -288,10 +316,7 @@ pub fn dijkstra<'g, N: Clone, E: Clone>(
             let new_weight = score.saturating_add(graph.weight(edge));
             if new_weight < dst_weight {
                 // Update the scores and pointers for the destination
-                let step = PathStep {
-                    edge: edge.clone(),
-                    node: node.clone(),
-                };
+                let step = PathStep::new(node.clone(), edge.clone());
                 previous.insert(edge.dst.clone(), step);
                 weights.insert(edge.dst.clone(), new_weight);
                 q.push(NodeScore::new(edge.dst.clone(), new_weight));
@@ -336,6 +361,11 @@ pub struct PathStep<'g, N, E> {
     node: NodeRef<'g, N, E>,
     edge: EdgeRef<'g, N, E>,
 }
+impl<'g, N, E> PathStep<'g, N, E> {
+    fn new(node: NodeRef<'g, N, E>, edge: EdgeRef<'g, N, E>) -> Self {
+        Self { node, edge }
+    }
+}
 
 /// Result from a successful shortest-path search
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -358,7 +388,7 @@ pub struct PathResult<'g, N, E> {
 ///
 /// The format of the [`Debug`] output is then roughly:
 ///
-/// ```
+/// ```text
 /// Node (
 ///     addr: 0xFFFFFFFF,
 ///     data: "1",
@@ -461,6 +491,7 @@ mod debug {
     /// Private type for "summarizing" the content of a node,
     /// solely for [`Debug`] printing purposes.
     struct NodeSummary<'g, N, E>(NodeRef<'g, N, E>);
+
     /// Private type for "summarizing" the content of an edge,
     /// solely for [`Debug`] printing purposes.
     struct EdgeSummary<'g, N, E>(EdgeRef<'g, N, E>);
